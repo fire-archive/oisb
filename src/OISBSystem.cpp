@@ -218,7 +218,7 @@ namespace OISB
         return 0;
     }
 
-	int System::loadActionSchemaFromXML(const String& filename)
+	int System::loadActionSchemaFromXMLFile(const String& filename)
 	{
 		// read the xml file
 		std::string input_xml;
@@ -238,10 +238,13 @@ namespace OISB
 		myfile.close();
 		std::vector<char> xml_copy(input_xml.begin(), input_xml.end());
 		xml_copy.push_back('\0');
+		return loadActionSchemaFromXML(&xml_copy[0]);
+	}
 
-		// xml in memory, now parse it
+	int System::loadActionSchemaFromXML(const char *xmlContent)
+	{
 		rapidxml::xml_document<> xmlActionSchema;
-		xmlActionSchema.parse<rapidxml::parse_declaration_node | rapidxml::parse_no_data_nodes>(&xml_copy[0]);
+		xmlActionSchema.parse<rapidxml::parse_declaration_node | rapidxml::parse_no_data_nodes>(const_cast<char *>(xmlContent));
 
 		/// walk the schemas
 		rapidxml::xml_node<>* schemasNode = xmlActionSchema.first_node("schemas");

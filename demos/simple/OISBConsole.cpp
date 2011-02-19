@@ -63,7 +63,7 @@ int main()
 		std::cout << "\nStartup done... Hit 'q' or ESC to exit.\n\n";
 
 		// load the schema from xml
-		OISB::System::getSingleton().loadActionSchemaFromXML("example_schema.xml");
+		OISB::System::getSingleton().loadActionSchemaFromXMLFile("example_schema.xml");
 
 		// get the actions as objects
 		OISB::Action *mExitAction = OISB::System::getSingleton().lookupAction("Default/Quit");
@@ -106,10 +106,15 @@ int main()
 		  std::cout << "\nOIS Exception Caught!\n" << "\t" << ex.eText << "[Line "
 			<< ex.eLine << " in " << ex.eFile << "]\nExiting App";
 		#endif
+		std::cout << "\n\nPress a key to exit\n\n";
+		getchar();
 	}
 	catch(std::exception &ex)
 	{
 		std::cout << "Caught std::exception: what = " << ex.what() << std::endl;
+		
+		std::cout << "\n\nPress a key to exit\n\n";
+		getchar();
 	}
 
 	//Destroying the manager will cleanup unfreed devices
@@ -122,7 +127,6 @@ int main()
 	XCloseDisplay(xDisp);
 #endif
 
-	std::cout << "\n\nGoodbye\n\n";
 	return 0;
 }
 
@@ -219,7 +223,7 @@ void doStartup()
 #endif
 
 	// dont grab the input
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#ifndef WIN32
 	pl.insert(OIS::ParamList::value_type("x11_mouse_hide", "false"));
 	pl.insert(OIS::ParamList::value_type("XAutoRepeatOn", "false"));
 	pl.insert(OIS::ParamList::value_type("x11_mouse_grab", "false"));
@@ -244,14 +248,12 @@ void doStartup()
 	printf("+ Total Mice: %d\n", g_InputManager->getNumberOfDevices(OISMouse));
 	printf("+ Total JoySticks: %d\n", g_InputManager->getNumberOfDevices(OISJoyStick));
 
-	//List all devices
-	printf("Devices:\n");
+	// List free devices
+	printf("Free Devices:\n");
 	OIS::DeviceList list = g_InputManager->listFreeDevices();
 	const char *mOISDeviceType[6] = {"Unknown Device", "Keyboard", "Mouse", "JoyStick", "Tablet", "Other Device"};
 	for(OIS::DeviceList::iterator i = list.begin(); i != list.end(); ++i )
-	{
 		printf("* Device: %s, Vendor: %s\n", mOISDeviceType[i->first], i->second);
-	}
 
 
     new OISB::System();

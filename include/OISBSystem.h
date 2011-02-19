@@ -227,14 +227,14 @@ namespace OISB
             void removeListenerFromAllBindables(BindableListener* listener);
 
 			/**
-			 * @brief loads schemas and actions from an xml file
+			 * @brief loads schemas and actions from a char string
 			 */
-			int loadActionSchemaFromXML(const String& filename);
+			int loadActionSchemaFromXML(const char *xmlContent);
 
 			/**
-			 * @brief shortcut to get an action from a schema
+			 * @brief loads schemas and actions from an xml file
 			 */
-			Action* System::getAction(const String& schema, const String& action) const;
+			int loadActionSchemaFromXMLFile(const String& filename);
 
 		private:
             /// singleton implementation pointer
@@ -285,6 +285,7 @@ namespace OISB
 			/// stores all action schemas
 			ActionSchemaMap mActionSchemas;
 
+			// xml processing things, should be moved to separate class later on
 			int processSchemaXML(rapidxml::xml_node<>* schemaNode);
 			int processActionXML(rapidxml::xml_node<>* actionNode, ActionSchema* schema);
 			int processActionBindingXML(rapidxml::xml_node<>* bindNode, Action *action);
