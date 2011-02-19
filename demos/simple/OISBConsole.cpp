@@ -218,8 +218,41 @@ void doStartup()
 	pl.insert(std::make_pair(std::string("WINDOW"), wnd.str()));
 #endif
 
+	// dont grab the input
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+	pl.insert(OIS::ParamList::value_type("x11_mouse_hide", "false"));
+	pl.insert(OIS::ParamList::value_type("XAutoRepeatOn", "false"));
+	pl.insert(OIS::ParamList::value_type("x11_mouse_grab", "false"));
+	pl.insert(OIS::ParamList::value_type("x11_keyboard_grab", "false"));
+#else
+	pl.insert(OIS::ParamList::value_type("w32_mouse", "DISCL_FOREGROUND"));
+	pl.insert(OIS::ParamList::value_type("w32_mouse", "DISCL_NONEXCLUSIVE"));
+	pl.insert(OIS::ParamList::value_type("w32_keyboard", "DISCL_FOREGROUND"));
+	pl.insert(OIS::ParamList::value_type("w32_keyboard", "DISCL_NONEXCLUSIVE"));
+#endif // LINUX
+
 	//This never returns null.. it will raise an exception on errors
 	g_InputManager = InputManager::createInputSystem(pl);
+
+
+	// print out some info
+	unsigned int v = g_InputManager->getVersionNumber();
+	printf("OIS Version: %d.%d.%d\n", v>>16, (v>>8) & 0x000000FF, v & 0x000000FF);
+	printf("+ Release Name: %s\n", g_InputManager->getVersionName().c_str());
+	printf("+ Manager: %s\n", g_InputManager->inputSystemName().c_str());
+	printf("+ Total Keyboards: %d\n", g_InputManager->getNumberOfDevices(OISKeyboard));
+	printf("+ Total Mice: %d\n", g_InputManager->getNumberOfDevices(OISMouse));
+	printf("+ Total JoySticks: %d\n", g_InputManager->getNumberOfDevices(OISJoyStick));
+
+	//List all devices
+	printf("Devices:\n");
+	OIS::DeviceList list = g_InputManager->listFreeDevices();
+	const char *mOISDeviceType[6] = {"Unknown Device", "Keyboard", "Mouse", "JoyStick", "Tablet", "Other Device"};
+	for(OIS::DeviceList::iterator i = list.begin(); i != list.end(); ++i )
+	{
+		printf("* Device: %s, Vendor: %s\n", mOISDeviceType[i->first], i->second);
+	}
+
 
     new OISB::System();
     OISB::System::getSingleton().initialize(g_InputManager);

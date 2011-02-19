@@ -250,11 +250,15 @@ namespace OISB
 			OIS::Mouse* mOISMouse;
             /// OIS keyboard, OISB::Keyboard wraps this
 			OIS::Keyboard* mOISKeyboard;
+            /// OIS joystick, OISB::Joystick wraps this
+			std::vector<OIS::JoyStick*> mOISJoysticks;
 
             /// our wrap mouse device
 			Mouse* mMouse;
             /// our wrap keyboard device
 			Keyboard* mKeyboard;
+            /// our wrap keyboard device
+			std::vector<JoyStick*> mJoysticks;
 
 			/**
 			 * @brief adds input device

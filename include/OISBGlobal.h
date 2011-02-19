@@ -100,6 +100,7 @@ namespace OISB
     class Keyboard;
     class LinearAnalogEmulator;
     class Mouse;
+    class JoyStick;
     class PropertySet;
     class SequenceAction;
     class System;

@@ -24,6 +24,7 @@ restrictions:
 #include "OISBSystem.h"
 #include "OISBMouse.h"
 #include "OISBKeyboard.h"
+#include "OISBJoystick.h"
 #include "OISBActionSchema.h"
 #include "OISBAction.h"
 #include "OISBState.h"
@@ -32,6 +33,7 @@ restrictions:
 #include "OISInputManager.h"
 #include "OISKeyboard.h"
 #include "OISMouse.h"
+#include "OISJoyStick.h"
 
 #include "OISBAnalogAxisAction.h"
 #include "OISBSequenceAction.h"
@@ -53,9 +55,10 @@ namespace OISB
 		mOIS(0),
 		mOISMouse(0),
 		mOISKeyboard(0),
+		mOISJoysticks(),
 		mMouse(0),
 		mKeyboard(0),
-
+		mJoysticks(),
         mDefaultActionSchema(0)
 	{
 		 msSingleton = this;
@@ -87,19 +90,31 @@ namespace OISB
 		if (mOIS->getNumberOfDevices(OIS::OISKeyboard) > 0)
 		{
 			mOISKeyboard = static_cast<OIS::Keyboard*>(mOIS->createInputObject(OIS::OISKeyboard, true));
+			mKeyboard = new Keyboard(mOISKeyboard);
+			addDevice(mKeyboard);
 		}
  
 		// If possible create a buffered mouse
 		if (mOIS->getNumberOfDevices(OIS::OISMouse) > 0)
 		{
 			mOISMouse = static_cast<OIS::Mouse*>(mOIS->createInputObject(OIS::OISMouse, true));
+			mMouse = new Mouse(mOISMouse);
+			addDevice(mMouse);
 		}
 
-		mMouse = new Mouse(mOISMouse);
-		addDevice(mMouse);
-
-		mKeyboard = new Keyboard(mOISKeyboard);
-		addDevice(mKeyboard);
+		// get all joysticks
+		int num_joy = mOIS->getNumberOfDevices(OIS::OISJoyStick);
+		if (num_joy > 0)
+		{
+			mOISJoysticks.resize(num_joy);
+			mJoysticks.resize(num_joy);
+			for(int i=0; i < num_joy; i++)
+			{
+				mOISJoysticks[i] = static_cast<OIS::JoyStick*>(mOIS->createInputObject(OIS::OISJoyStick, true));
+				mJoysticks[i]    = new JoyStick(mOISJoysticks[i]);
+				addDevice(mJoysticks[i]);
+			}
+		}
 
 		mInitialized = true;
 	}
@@ -111,23 +126,35 @@ namespace OISB
 			return;
 		}
 
-		removeDevice(mMouse);
-		delete mMouse;
-		removeDevice(mKeyboard);
-		delete mKeyboard;
-
 		if (mOISMouse)
 		{
+			removeDevice(mMouse);
+			delete mMouse;
+			mMouse = 0;
 			mOIS->destroyInputObject(mOISMouse);
 			mOISMouse = 0;
 		}
  
 		if (mOISKeyboard)
 		{
+			removeDevice(mKeyboard);
+			delete mKeyboard;
+			mKeyboard = 0;
 			mOIS->destroyInputObject(mOISKeyboard);
 			mOISKeyboard = 0;
 		}
  
+		// remove all joysticks
+		for(unsigned int i=0; i < mOISJoysticks.size(); i++)
+		{
+			removeDevice(mJoysticks[i]);
+			delete(mJoysticks[i]);
+
+			mOIS->destroyInputObject(mOISJoysticks[i]);
+		}
+		mJoysticks.clear();
+		mOISJoysticks.clear();
+
 		mOIS->destroyInputSystem(mOIS);
 		mOIS = 0;
 
@@ -138,6 +165,8 @@ namespace OISB
 	{
 		mOISMouse->capture();
 		mOISKeyboard->capture();
+		for(unsigned int i=0; i < mOISJoysticks.size(); i++)
+			mOISJoysticks[i]->capture();
 
 		for (DeviceMap::const_iterator it = mDevices.begin(); it != mDevices.end(); ++it)
 		{
@@ -257,6 +286,7 @@ namespace OISB
 		// process all attributes
 		for (xml_attribute<> *attr = actionNode->first_attribute(); attr; attr = attr->next_attribute())
 		{
+			// beware, this assumes that the type and name comes first
 			if     (!strcmp(attr->name(), "type")) type = std::string(attr->value());
 			else if(!strcmp(attr->name(), "name")) name = std::string(attr->value());
 			else if(tmpAction)
