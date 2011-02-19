@@ -319,7 +319,20 @@ namespace OISB
 	int System::processActionBindingXML(rapidxml::xml_node<>* bindNode, Action *action)
 	{
 		if(!bindNode || !action) return 1;
-		action->bind(std::string(bindNode->value()));
+
+		bool optional = false;
+		if(bindNode->first_attribute("optional"))
+			optional = true;
+
+		try
+		{
+			action->bind(std::string(bindNode->value()));
+		} catch(const OIS::Exception &ex)
+		{
+			// rethrow if this binding is not optional
+			if(!optional)
+				throw(ex);
+		}
 		return 0;
 	}
 

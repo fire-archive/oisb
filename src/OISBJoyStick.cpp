@@ -66,6 +66,12 @@ namespace OISB
 			// TODO: fix POV
 			buttons.push_back(new DigitalState(this, String(tmp)));
 		}
+
+		// now add the states
+		for(std::vector<AnalogAxisState*>::iterator it = axis.begin(); it != axis.end(); it++)
+			addState(*it);
+		for(std::vector<DigitalState*>::iterator it = buttons.begin(); it != buttons.end(); it++)
+			addState(*it);
 	}
 			
 	JoyStick::~JoyStick()
@@ -86,7 +92,8 @@ namespace OISB
 
 	const String& JoyStick::getName() const
 	{
-		static String name = "JoyStick";
+		//static String name = "JoyStick" + mJoyStick->getID() mJoyStick->vendor();
+		static String name = mJoyStick->vendor();
 		return name;
 	}
 
@@ -95,8 +102,10 @@ namespace OISB
 		const OIS::JoyStickState& state = mJoyStick->getJoyStickState();
 		for(unsigned int a = 0; a < state.mAxes.size(); a++)
 		{
-			axis[a]->_setAbsoluteValue(state.mAxes[a].abs / (float)OIS::JoyStick::MAX_AXIS);
-			axis[a]->_setRelativeValue(state.mAxes[a].rel / (float)OIS::JoyStick::MAX_AXIS);
+			if(state.mAxes[a].absOnly)
+				axis[a]->_setAbsoluteValue(state.mAxes[a].abs / (float)OIS::JoyStick::MAX_AXIS);
+			else
+				axis[a]->_setRelativeValue(state.mAxes[a].rel / (float)OIS::JoyStick::MAX_AXIS);
 		}
 		for(unsigned int b = 0; b < state.mButtons.size(); b++)
 		{

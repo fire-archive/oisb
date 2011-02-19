@@ -67,12 +67,14 @@ int main()
 
 		// get the actions as objects
 		OISB::Action *mExitAction = OISB::System::getSingleton().lookupAction("Default/Quit");
+		OISB::AnalogAxisAction *mExample1  = (OISB::AnalogAxisAction*)OISB::System::getSingleton().lookupAction("Chopter/Throttle");
+		OISB::AnalogAxisAction *mExample2  = (OISB::AnalogAxisAction*)OISB::System::getSingleton().lookupAction("Chopter/Fire");
 
 		while(appRunning)
 		{
 			//Throttle down CPU usage
 			#if defined OIS_WIN32_PLATFORM
-			  Sleep(90);
+			  Sleep(30);
 			  MSG  msg;
 			  while( PeekMessage( &msg, NULL, 0U, 0U, PM_REMOVE ) )
 			  {
@@ -93,6 +95,17 @@ int main()
 				  break;
 			  }
 
+			  if (mExample2->isActive())
+			  {
+				  printf("missile launched\n");
+			  }
+
+
+			  
+			  if(mExample1->hasChanged())
+			  {
+				  printf("Throttle changed: %f\n",  mExample1->getAbsoluteValue());
+			  }
 			  // TODO: add proper timer in here
 			  OISB::System::getSingleton().process(0);
 		}
