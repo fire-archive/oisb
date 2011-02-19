@@ -33,6 +33,13 @@ restrictions:
 #include "OISKeyboard.h"
 #include "OISMouse.h"
 
+#include "OISBAnalogAxisAction.h"
+
+#include <strstream>
+#include <fstream>
+
+using namespace rapidxml;
+
 namespace OISB
 {
     // static member singleton pointer
@@ -179,6 +186,89 @@ namespace OISB
         // nothing was found
         return 0;
     }
+
+	int System::loadActionSchemaFromXML(const String& filename)
+	{
+		// TODO: this crashes badly when XML is not well-formed, need to add pointer guards
+		// Read all the ai entities data and save it
+		std::string input_xml;
+		std::string line;
+		std::ifstream myfile (filename.c_str());
+		if ( myfile.is_open() )
+		{
+			while (! myfile.eof() )
+			{
+				std::getline (myfile,line);
+				input_xml += line;
+			}
+		} else
+		{
+			return 1;
+		}
+		myfile.close();
+		
+		rapidxml::xml_document<> xmlActionSchema;
+		std::vector<char> xml_copy(input_xml.begin(), input_xml.end());
+		xml_copy.push_back('\0');
+		xmlActionSchema.parse<rapidxml::parse_declaration_node | rapidxml::parse_no_data_nodes>(&xml_copy[0]);
+
+		/// get the entities
+		rapidxml::xml_node<>* schemasNode = xmlActionSchema.first_node("schemas");
+        for (rapidxml::xml_node<> *child = schemasNode->first_node("schema"); child; child = child->next_sibling())
+			processSchemaXML(child);
+		return 0;
+	}
+
+	int System::processSchemaXML(rapidxml::xml_node<>* schemaNode)
+	{
+		if(!schemaNode) return 1;
+		ActionSchema* schema=0;
+		std::string schema_name = schemaNode->first_attribute("name")->value();
+		if (!hasActionSchema(schema_name))
+			schema = createActionSchema(schema_name, false);
+		else
+			schema = getActionSchema(schema_name);
+		
+		// then process the actions
+        for (rapidxml::xml_node<> *child = schemaNode->first_node("action"); child; child = child->next_sibling())
+			processActionXML(child, schema);
+
+		return 0;
+	}
+
+	int System::processActionXML(rapidxml::xml_node<>* actionNode, ActionSchema* schema)
+	{
+		std::string type="", name="";
+		float minimumValue=0, maximumValue=0, emulationSpeed=0, emulationReturnSpeed=0, emulationReturnValue=0;
+
+		for (xml_attribute<> *attr = actionNode->first_attribute(); attr; attr = attr->next_attribute())
+		{
+			if     (!strcmp(attr->name(), "type"))                 type           = attr->value();
+			else if(!strcmp(attr->name(), "name"))                 name           = attr->value();
+			else if(!strcmp(attr->name(), "MinimumValue"))         minimumValue   = atof(attr->value());
+			else if(!strcmp(attr->name(), "MaximumValue"))         maximumValue   = atof(attr->value());
+			else if(!strcmp(attr->name(), "EmulationSpeed"))       emulationSpeed = atof(attr->value());
+			else if(!strcmp(attr->name(), "EmulationReturnSpeed")) emulationReturnSpeed = atof(attr->value());
+			else if(!strcmp(attr->name(), "EmulationReturnValue")) emulationReturnValue = atof(attr->value());
+		}
+
+		if(type == "AnalogAxisAction")
+		{
+			AnalogAxisAction *tmpAction = schema->createAction<OISB::AnalogAxisAction>(name);
+			tmpAction->setProperty("MinimumValue",         minimumValue);
+			tmpAction->setProperty("MaximumValue",         maximumValue);
+			tmpAction->setProperty("EmulationSpeed",       emulationSpeed);
+			tmpAction->setProperty("EmulationReturnSpeed", emulationReturnSpeed);
+			tmpAction->setProperty("EmulationReturnValue", emulationReturnValue);
+			
+			// TODO: bindings
+			//tmpAction->bind("Keyboard/A", "Keyboard/D");
+		}
+		// TODO: other action types
+
+		return 0;
+	}
+
 
     ActionSchema* System::createActionSchema(const String& name, bool setAsDefault)
 	{

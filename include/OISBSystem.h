@@ -27,6 +27,8 @@ restrictions:
 #include "OISBGlobal.h"
 #include "OISBString.h"
 
+#include "rapidxml.hpp"
+
 #include <cassert>
 
 namespace OISB
@@ -224,6 +226,11 @@ namespace OISB
              */
             void removeListenerFromAllBindables(BindableListener* listener);
 
+			/**
+			 * @brief loads schemas and actions from an xml file
+			 */
+			int loadActionSchemaFromXML(const String& filename);
+
 		private:
             /// singleton implementation pointer
             static System* msSingleton;
@@ -268,6 +275,10 @@ namespace OISB
 			typedef std::map<String, ActionSchema*> ActionSchemaMap;
 			/// stores all action schemas
 			ActionSchemaMap mActionSchemas;
+
+			int processSchemaXML(rapidxml::xml_node<>* schemaNode);
+			int processActionXML(rapidxml::xml_node<>* actionNode, ActionSchema* schema);
+
 	};
 }
 
