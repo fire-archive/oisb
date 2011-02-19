@@ -6,7 +6,9 @@
 #include <OISBSequenceAction.h>
 #include <OISBBinding.h>
 
+// OIS Bits
 #include <OISInputManager.h>
+#include <OISException.h>
 
 #include <iostream>
 #include <sstream>
@@ -63,9 +65,8 @@ int main()
 		// load the schema from xml
 		OISB::System::getSingleton().loadActionSchemaFromXML("example_schema.xml");
 
-
-		OISB::ActionSchema *schema = OISB::System::getSingleton().getActionSchema("Default");
-		OISB::Action *mExitAction = schema->getAction("Quit");
+		// get the actions as objects
+		OISB::Action *mExitAction = OISB::System::getSingleton().lookupAction("Default/Quit");
 
 		while(appRunning)
 		{
@@ -95,6 +96,16 @@ int main()
 			  // TODO: add proper timer in here
 			  OISB::System::getSingleton().process(0);
 		}
+	}
+	catch( const OIS::Exception &ex )
+	{
+		#if defined OIS_WIN32_PLATFORM
+		  MessageBox( NULL, ex.eText, "An exception has occurred!", MB_OK |
+				MB_ICONERROR | MB_TASKMODAL);
+		#else
+		  std::cout << "\nOIS Exception Caught!\n" << "\t" << ex.eText << "[Line "
+			<< ex.eLine << " in " << ex.eFile << "]\nExiting App";
+		#endif
 	}
 	catch(std::exception &ex)
 	{

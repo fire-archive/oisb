@@ -375,7 +375,7 @@ namespace OISB
 		return getDefaultActionSchema();
 	}
 
-    Action* System::lookupAction(const String& name) const
+    Action* System::lookupAction(const String& name, bool throwOnMissing) const
     {
         String::size_type i = name.find("/");
         const String schemaName = name.substr(0, i); // -1 because we want to copy just before the "/"
@@ -388,8 +388,22 @@ namespace OISB
             if (schema->hasAction(actionName))
             {
                 return schema->getAction(actionName);
-            }
-        }
+            } else
+			{
+				if(throwOnMissing) 
+				{
+					String errorString = String("Action '") + actionName + String("' in schema '") + schemaName + String("' not found");
+					OIS_EXCEPT(OIS::E_General, errorString.c_str());
+				}
+			}
+        } else
+		{
+			if(throwOnMissing)
+			{
+				String errorString = String("Action schema '") + schemaName + String("' not found");
+				OIS_EXCEPT(OIS::E_General, errorString.c_str());
+			}
+		}
 
         // nothing was found
         return 0;

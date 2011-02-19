@@ -183,7 +183,7 @@ namespace OISB
              * @param name name of the action (e.g. Ingame/Shoot)
              * @return pointer to the discovered action (0 if none is found)
              */
-            Action* lookupAction(const String& name) const;
+            Action* lookupAction(const String& name, bool throwOnMissing=true) const;
 
             /**
              * @brief this method tries to lookup a bindable by it's full name (works for states and actions)
@@ -230,6 +230,11 @@ namespace OISB
 			 * @brief loads schemas and actions from an xml file
 			 */
 			int loadActionSchemaFromXML(const String& filename);
+
+			/**
+			 * @brief shortcut to get an action from a schema
+			 */
+			Action* System::getAction(const String& schema, const String& action) const;
 
 		private:
             /// singleton implementation pointer
