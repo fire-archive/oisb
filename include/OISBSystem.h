@@ -278,6 +278,7 @@ namespace OISB
 
 			int processSchemaXML(rapidxml::xml_node<>* schemaNode);
 			int processActionXML(rapidxml::xml_node<>* actionNode, ActionSchema* schema);
+			int processActionBindingXML(rapidxml::xml_node<>* bindNode, Action *action);
 
 	};
 }

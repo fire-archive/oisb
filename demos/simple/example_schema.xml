@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemas>
+	<schema name="Default">
+		<action type="Trigger" name="Quit">
+			<bind>Keyboard/Q</bind>
+			<bind>Keyboard/Esc</bind>
+		</action>
+	</schema>
 	<schema name="Chopter">
-		<action type="AnalogAxisAction" name="Throttle" MinimumValue="0" MaximumValue="100" EmulationReturnValue="9" EmulationSpeed="10" EmulationReturnSpeed="4" />
+		<action type="AnalogAxis" name="Throttle" MinimumValue="0" MaximumValue="100" EmulationReturnValue="9" EmulationSpeed="10" EmulationReturnSpeed="4" />
 	</schema>
 	<schema name="Car">
-		<action type="AnalogAxisAction" name="Brake" MinimumValue="0" MaximumValue="10" EmulationReturnValue="3" EmulationSpeed="1" EmulationReturnSpeed="2" />
+		<action type="AnalogAxis" name="Brake" MinimumValue="0" MaximumValue="10" EmulationReturnValue="3" EmulationSpeed="1" EmulationReturnSpeed="2" />
 	</schema>
 </schemas>

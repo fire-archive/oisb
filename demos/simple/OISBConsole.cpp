@@ -63,6 +63,10 @@ int main()
 		// load the schema from xml
 		OISB::System::getSingleton().loadActionSchemaFromXML("example_schema.xml");
 
+
+		OISB::ActionSchema *schema = OISB::System::getSingleton().getActionSchema("Default");
+		OISB::Action *mExitAction = schema->getAction("Quit");
+
 		while(appRunning)
 		{
 			//Throttle down CPU usage
@@ -82,7 +86,14 @@ int main()
 			  usleep( 500 );
 			#endif
 
+			  //check if we should exit
+			  if (mExitAction->isActive())
+			  {
+				  break;
+			  }
 
+			  // TODO: add proper timer in here
+			  OISB::System::getSingleton().process(0);
 		}
 	}
 	catch(std::exception &ex)

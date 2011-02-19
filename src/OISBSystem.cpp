@@ -191,8 +191,7 @@ namespace OISB
 
 	int System::loadActionSchemaFromXML(const String& filename)
 	{
-		// TODO: this crashes badly when XML is not well-formed, need to add pointer guards
-		// Read all the ai entities data and save it
+		// read the xml file
 		std::string input_xml;
 		std::string line;
 		std::ifstream myfile (filename.c_str());
@@ -208,16 +207,22 @@ namespace OISB
 			return 1;
 		}
 		myfile.close();
-		
-		rapidxml::xml_document<> xmlActionSchema;
 		std::vector<char> xml_copy(input_xml.begin(), input_xml.end());
 		xml_copy.push_back('\0');
+
+		// xml in memory, now parse it
+		rapidxml::xml_document<> xmlActionSchema;
 		xmlActionSchema.parse<rapidxml::parse_declaration_node | rapidxml::parse_no_data_nodes>(&xml_copy[0]);
 
-		/// get the entities
+		/// walk the schemas
 		rapidxml::xml_node<>* schemasNode = xmlActionSchema.first_node("schemas");
-        for (rapidxml::xml_node<> *child = schemasNode->first_node("schema"); child; child = child->next_sibling())
-			processSchemaXML(child);
+		if(schemasNode)
+		{
+			for (rapidxml::xml_node<> *child = schemasNode->first_node("schema"); child; child = child->next_sibling())
+			{
+				processSchemaXML(child);
+			}
+		}
 		return 0;
 	}
 
@@ -225,6 +230,10 @@ namespace OISB
 	{
 		if(!schemaNode) return 1;
 		ActionSchema* schema=0;
+
+		// check for missing name
+		if(!schemaNode->first_attribute("name")) return 2;
+
 		std::string schema_name = schemaNode->first_attribute("name")->value();
 		if (!hasActionSchema(schema_name))
 			schema = createActionSchema(schema_name, false);
@@ -240,10 +249,12 @@ namespace OISB
 
 	int System::processActionXML(rapidxml::xml_node<>* actionNode, ActionSchema* schema)
 	{
+		if(!actionNode) return 1;
+
 		std::string type="", name="";
-		float minimumValue=0, maximumValue=0, emulationSpeed=0, emulationReturnSpeed=0, emulationReturnValue=0;
 
 		Action *tmpAction = 0;
+		// process all attributes
 		for (xml_attribute<> *attr = actionNode->first_attribute(); attr; attr = attr->next_attribute())
 		{
 			if     (!strcmp(attr->name(), "type")) type = std::string(attr->value());
@@ -256,14 +267,26 @@ namespace OISB
 			// check if we can create the object already
 			if(!type.empty() && !name.empty() && !tmpAction)
 			{
-				if     (type == "AnalogAxisAction")
+				if     (type == "AnalogAxis")
 					tmpAction = schema->createAction<OISB::AnalogAxisAction>(name);
-				else if(type == "SequenceAction")
+				else if(type == "Sequence")
 					tmpAction = schema->createAction<OISB::SequenceAction>(name);
-				else if(type == "TriggerAction")
+				else if(type == "Trigger")
 					tmpAction = schema->createAction<OISB::TriggerAction>(name);
 			}
 		}
+
+		// then process the child bindings
+        for (rapidxml::xml_node<> *child = actionNode->first_node("bind"); child; child = child->next_sibling())
+			processActionBindingXML(child, tmpAction);
+
+		return 0;
+	}
+
+	int System::processActionBindingXML(rapidxml::xml_node<>* bindNode, Action *action)
+	{
+		if(!bindNode || !action) return 1;
+		action->bind(std::string(bindNode->value()));
 		return 0;
 	}
 
