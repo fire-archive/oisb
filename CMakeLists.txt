@@ -15,7 +15,7 @@ include_directories(include)
 include_directories(${OISB_OIS_INCLUDE_DIR})
 
 # oisb library
-add_library(oisb STATIC ${sources} ${sources_win})
+add_library(oisb STATIC ${sources} ${includes})
 
 # oisb simple demo
 include_directories(demo/simple)

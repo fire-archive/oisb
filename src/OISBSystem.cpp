@@ -34,6 +34,8 @@ restrictions:
 #include "OISMouse.h"
 
 #include "OISBAnalogAxisAction.h"
+#include "OISBSequenceAction.h"
+#include "OISBTriggerAction.h"
 
 #include <strstream>
 #include <fstream>
@@ -241,31 +243,27 @@ namespace OISB
 		std::string type="", name="";
 		float minimumValue=0, maximumValue=0, emulationSpeed=0, emulationReturnSpeed=0, emulationReturnValue=0;
 
+		Action *tmpAction = 0;
 		for (xml_attribute<> *attr = actionNode->first_attribute(); attr; attr = attr->next_attribute())
 		{
-			if     (!strcmp(attr->name(), "type"))                 type           = attr->value();
-			else if(!strcmp(attr->name(), "name"))                 name           = attr->value();
-			else if(!strcmp(attr->name(), "MinimumValue"))         minimumValue   = atof(attr->value());
-			else if(!strcmp(attr->name(), "MaximumValue"))         maximumValue   = atof(attr->value());
-			else if(!strcmp(attr->name(), "EmulationSpeed"))       emulationSpeed = atof(attr->value());
-			else if(!strcmp(attr->name(), "EmulationReturnSpeed")) emulationReturnSpeed = atof(attr->value());
-			else if(!strcmp(attr->name(), "EmulationReturnValue")) emulationReturnValue = atof(attr->value());
-		}
+			if     (!strcmp(attr->name(), "type")) type = std::string(attr->value());
+			else if(!strcmp(attr->name(), "name")) name = std::string(attr->value());
+			else if(tmpAction)
+			{
+				tmpAction->setProperty(std::string(attr->name()), std::string(attr->value()));
+			}
 
-		if(type == "AnalogAxisAction")
-		{
-			AnalogAxisAction *tmpAction = schema->createAction<OISB::AnalogAxisAction>(name);
-			tmpAction->setProperty("MinimumValue",         minimumValue);
-			tmpAction->setProperty("MaximumValue",         maximumValue);
-			tmpAction->setProperty("EmulationSpeed",       emulationSpeed);
-			tmpAction->setProperty("EmulationReturnSpeed", emulationReturnSpeed);
-			tmpAction->setProperty("EmulationReturnValue", emulationReturnValue);
-			
-			// TODO: bindings
-			//tmpAction->bind("Keyboard/A", "Keyboard/D");
+			// check if we can create the object already
+			if(!type.empty() && !name.empty() && !tmpAction)
+			{
+				if     (type == "AnalogAxisAction")
+					tmpAction = schema->createAction<OISB::AnalogAxisAction>(name);
+				else if(type == "SequenceAction")
+					tmpAction = schema->createAction<OISB::SequenceAction>(name);
+				else if(type == "TriggerAction")
+					tmpAction = schema->createAction<OISB::TriggerAction>(name);
+			}
 		}
-		// TODO: other action types
-
 		return 0;
 	}
 
