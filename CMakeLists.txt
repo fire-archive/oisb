@@ -5,7 +5,7 @@ project(OISB)
 set(VERSION 0.1.0)
 
 set(OISB_OIS_INCLUDE_DIR "" CACHE PATH "")
-set(OISB_OIS_LIB "" CACHE PATH "")
+set(OISB_OIS_LIB "" CACHE FILEPATH "")
 
 FILE(GLOB sources   src/*.cpp)
 FILE(GLOB includes  include/*.h)
