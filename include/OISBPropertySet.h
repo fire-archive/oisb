@@ -53,13 +53,6 @@ namespace OISB
                 impl_setProperty(name, toString(value));
             }
 
-            /// @copydoc PropertySet::setProperty
-            template<>
-            inline void setProperty<String>(const String& name, const String& value)
-            {
-                impl_setProperty(name, value);
-            }
-
             /**
              * @brief gets property of given name and the result is returned as given type
              */
@@ -69,14 +62,13 @@ namespace OISB
                 return fromString<typename T>(impl_getProperty(name));
             }
 
-            /// @copydoc PropertySet::getProperty
-            template<>
-            inline String getProperty<String>(const String& name) const
+            // stub method, compiler will pick this up if possible (it has priority over the templated variant)
+            inline static const String& toString(const String& value)
             {
-                return impl_getProperty(name);
+                return value;
             }
 
-            /// coverts given type to string, idea from boost::lexical_cast
+            /// converts given type to string, idea from boost::lexical_cast
             template<typename T>
             inline static String toString(const T& value)
             {
@@ -84,6 +76,12 @@ namespace OISB
                 sstr << value;
 
                 return sstr.str();
+            }
+
+            // stub method, compiler will pick this up if possible (it has priority over the templated variant)
+            inline static const String& fromString(const String& value)
+            {
+                return value;
             }
 
             /// converts given string to type, idea from boost::lexical_cast
