@@ -57,9 +57,9 @@ namespace OISB
              * @brief gets property of given name and the result is returned as given type
              */
             template<typename T>
-            inline typename T getProperty(const String& name) const
+            inline T getProperty(const String& name) const
             {
-                return fromString<typename T>(impl_getProperty(name));
+                return fromString<T>(impl_getProperty(name));
             }
 
             // stub method, compiler will pick this up if possible (it has priority over the templated variant)

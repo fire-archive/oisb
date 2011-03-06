@@ -24,7 +24,7 @@ restrictions:
 #include "OISBSystem.h"
 #include "OISBMouse.h"
 #include "OISBKeyboard.h"
-#include "OISBJoystick.h"
+#include "OISBJoyStick.h"
 #include "OISBActionSchema.h"
 #include "OISBAction.h"
 #include "OISBState.h"
@@ -42,6 +42,7 @@ restrictions:
 #include <strstream>
 #include <fstream>
 #include <iostream>
+#include <cstring>
 
 using namespace rapidxml;
 
