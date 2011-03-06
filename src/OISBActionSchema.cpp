@@ -30,6 +30,7 @@ restrictions:
 #include "OISException.h"
 
 #include <cassert>
+#include <iostream>
 
 namespace OISB
 {
@@ -143,5 +144,18 @@ namespace OISB
 		{
 			it->second->process(delta);
 		}
+	}
+
+	void ActionSchema::dump()
+	{
+	    std::cout << "** Action schema: '" << mName << "'" << std::endl;
+
+	    for (ActionMap::const_iterator it = mActions.begin(); it != mActions.end(); ++it)
+        {
+	        // TODO: dump action type too
+            std::cout << "** - Action: " << it->second->getName() << std::endl;
+        }
+
+	    std::cout << "** End of action schema '" << mName << "'" << std::endl;
 	}
 }

@@ -85,6 +85,11 @@ namespace OISB
 			 */
 			virtual void process(Real delta) = 0;
 			
+			/**
+			 * @brief a method to ease debugging, dumps all this device to stdout
+			 */
+			void dump();
+
 		protected:
 			/**
 			 * @brief adds input state

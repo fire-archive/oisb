@@ -25,6 +25,8 @@ restrictions:
 #include "OISBState.h"
 #include "OISException.h"
 
+#include <iostream>
+
 namespace OISB
 {
 	Device::Device()
@@ -93,5 +95,18 @@ namespace OISB
 		}
 		
 		mStates.erase(it);
+	}
+
+	void Device::dump()
+	{
+	    std::cout << "** Device: '" << getName() << "'" << std::endl;
+
+	    for (StateMap::const_iterator it = mStates.begin(); it != mStates.end(); ++it)
+        {
+	        // TODO: dump state type too
+            std::cout << "** - State: " << it->second->getName() << std::endl;
+        }
+
+        std::cout << "** End of device '" << getName() << "'" << std::endl;
 	}
 }

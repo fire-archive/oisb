@@ -41,6 +41,7 @@ restrictions:
 
 #include <strstream>
 #include <fstream>
+#include <iostream>
 
 using namespace rapidxml;
 
@@ -515,6 +516,30 @@ namespace OISB
     {
         removeListenerFromAllActions(listener);
         removeListenerFromAllStates(listener);
+    }
+
+    void System::dumpDevices()
+    {
+        std::cout << "Dumping all registered OISB devices: " << std::endl;
+
+        for (DeviceMap::const_iterator it = mDevices.begin(); it != mDevices.end(); ++it)
+        {
+            it->second->dump();
+        }
+
+        std::cout << "End of dump!" << std::endl;
+    }
+
+    void System::dumpActionSchemas()
+    {
+        std::cout << "Dumping all registered OISB action schemas: " << std::endl;
+
+        for (ActionSchemaMap::const_iterator it = mActionSchemas.begin(); it != mActionSchemas.end(); ++it)
+        {
+            it->second->dump();
+        }
+
+        std::cout << "End of dump!" << std::endl;
     }
 	
 	void System::addDevice(Device* device)

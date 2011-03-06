@@ -236,6 +236,16 @@ namespace OISB
 			 */
 			int loadActionSchemaFromXMLFile(const String& filename);
 
+			/**
+             * @brief a method to ease debugging, dumps all actions schemas to stdout
+             */
+            void dumpDevices();
+
+			/**
+			 * @brief a method to ease debugging, dumps all actions schemas to stdout
+			 */
+			void dumpActionSchemas();
+
 		private:
             /// singleton implementation pointer
             static System* msSingleton;

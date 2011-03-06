@@ -137,6 +137,11 @@ namespace OISB
 			 */
 			void process(Real delta);
 			
+			/**
+			 * @brief a method to ease debugging, dumps this action schema into stdout
+			 */
+			void dump();
+
 		private:
 			/// stores name / identifier
 			const String mName;
