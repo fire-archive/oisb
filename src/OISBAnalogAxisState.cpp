@@ -22,6 +22,8 @@ restrictions:
 */
 
 #include "OISBAnalogAxisState.h"
+#include <cmath>
+#include <limits>
 
 namespace OISB
 {
