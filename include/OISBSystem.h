@@ -183,7 +183,7 @@ namespace OISB
              * @param name name of the action (e.g. Ingame/Shoot)
              * @return pointer to the discovered action (0 if none is found)
              */
-            Action* lookupAction(const String& name, bool throwOnMissing=true) const;
+            Action* lookupAction(const String& name, bool throwOnMissing = true) const;
 
             /**
              * @brief this method tries to lookup a bindable by it's full name (works for states and actions)

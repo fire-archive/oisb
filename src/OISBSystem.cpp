@@ -436,17 +436,19 @@ namespace OISB
             if (schema->hasAction(actionName))
             {
                 return schema->getAction(actionName);
-            } else
+            }
+            else
 			{
-				if(throwOnMissing) 
+				if (throwOnMissing)
 				{
 					String errorString = String("Action '") + actionName + String("' in schema '") + schemaName + String("' not found");
 					OIS_EXCEPT(OIS::E_General, errorString.c_str());
 				}
 			}
-        } else
+        }
+        else
 		{
-			if(throwOnMissing)
+			if (throwOnMissing)
 			{
 				String errorString = String("Action schema '") + schemaName + String("' not found");
 				OIS_EXCEPT(OIS::E_General, errorString.c_str());
@@ -465,7 +467,7 @@ namespace OISB
             return state;
         }
 
-        Action* action = lookupAction(name);
+        Action* action = lookupAction(name, false);
         if (action)
         {
             return action;
