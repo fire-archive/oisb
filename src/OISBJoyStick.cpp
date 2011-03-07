@@ -27,6 +27,8 @@ restrictions:
 
 #include <OISJoyStick.h>
 
+#include <stdio.h>
+
 // TODO: finish sliders, POV
 
 namespace OISB

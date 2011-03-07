@@ -1,20 +1,29 @@
 cmake_minimum_required(VERSION 2.4)
+if(COMMAND cmake_policy)
+ cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
 
 project(OISB)
 
 set(VERSION 0.1.0)
 
-set(OISB_OIS_INCLUDE_DIR "" CACHE PATH "")
-set(OISB_OIS_LIB "" CACHE FILEPATH "")
+IF(WIN32)
+ set(OIS_INCLUDE_DIR "" CACHE PATH "")
+ set(OIS_LIBRARIES "" CACHE FILEPATH "")
+ELSE(WIN32)
+ find_package(PkgConfig)
+ PKG_CHECK_MODULES  (OIS OIS REQUIRED)
+ include_directories(${OIS_INCLUDE_DIRS})
+ link_directories(${OIS_LIBRARY_DIRS})
+ENDIF(WIN32)
 
 FILE(GLOB sources   src/*.cpp)
 FILE(GLOB includes  include/*.h)
 
 # general flags
-add_definitions(-D_LIB -D_CRT_SECURE_NO_WARNINGS -DOISB_STATIC_LIB)
 
+add_definitions(-D_LIB -D_CRT_SECURE_NO_WARNINGS -DOISB_STATIC_LIB)
 include_directories(include)
-include_directories(${OISB_OIS_INCLUDE_DIR})
 
 # cpack
 set(CPACK_PACKAGE_DESCRIPTION "OISB - Object Oriented Input System Binding library")
@@ -54,7 +63,7 @@ install(TARGETS oisb ARCHIVE DESTINATION lib)
 # oisb simple demo
 include_directories(demo/simple)
 add_executable(oisb_console demos/simple/OISBConsole.cpp demos/simple/CommandLine.rc)
-target_link_libraries(oisb_console oisb ${OISB_OIS_LIB})
+target_link_libraries(oisb_console oisb ${OIS_LIBRARIES})
 
 install(TARGETS oisb_console RUNTIME DESTINATION bin)
 

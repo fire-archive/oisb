@@ -9,9 +9,12 @@
 // OIS Bits
 #include <OISInputManager.h>
 #include <OISException.h>
+#include <OISMouse.h>
 
 #include <iostream>
 #include <sstream>
+
+#include <stdio.h>
 
 ////////////////////////////////////Needed Windows Headers////////////
 #if defined OIS_WIN32_PLATFORM
@@ -266,7 +269,7 @@ void doStartup()
 	OIS::DeviceList list = g_InputManager->listFreeDevices();
 	const char *mOISDeviceType[6] = {"Unknown Device", "Keyboard", "Mouse", "JoyStick", "Tablet", "Other Device"};
 	for(OIS::DeviceList::iterator i = list.begin(); i != list.end(); ++i )
-		printf("* Device: %s, Vendor: %s\n", mOISDeviceType[i->first], i->second);
+		printf("* Device: %s, Vendor: %s\n", mOISDeviceType[i->first], i->second.c_str());
 
 
     new OISB::System();
@@ -282,6 +285,7 @@ LRESULT DlgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 
 #if defined OIS_LINUX_PLATFORM
 //This is just here to show that you still recieve x11 events, as the lib only needs mouse/key events
+OIS::Mouse	 *g_m   = 0;				//Mouse Device
 void checkX11Events()
 {
 	XEvent event;
@@ -295,7 +299,7 @@ void checkX11Events()
 		{
 			if( g_m )
 			{
-				const MouseState &ms = g_m->getMouseState();
+				const OIS::MouseState &ms = g_m->getMouseState();
 				ms.width = event.xconfigure.width;
 				ms.height = event.xconfigure.height;
 			}
