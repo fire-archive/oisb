@@ -15,6 +15,7 @@ ELSE(WIN32)
  PKG_CHECK_MODULES  (OIS OIS REQUIRED)
  include_directories(${OIS_INCLUDE_DIRS})
  link_directories(${OIS_LIBRARY_DIRS})
+ SET(CMAKE_CXX_FLAGS "-Wall")
 ENDIF(WIN32)
 
 FILE(GLOB sources   src/*.cpp)
